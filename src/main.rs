@@ -1,5 +1,7 @@
 use crate::support::init;
-use glium::texture::integral_texture2d::IntegralTexture2d as Texture2D;
+use crate::support::System;
+use glium::backend::Facade;
+use glium::Texture2d;
 use image::io::Reader as ImageReader;
 use imgui::*;
 use rand::Rng;
@@ -36,29 +38,34 @@ fn load_image(name: &str) -> image::RgbImage {
     rgb_img
 }
 
-fn image_into_texture(img: image::RgbImage, ctx: &Rc<glium::backend::Context>) -> Texture2D {
+fn image_into_texture(img: image::RgbImage, system: &mut System) -> TextureId {
     let w = img.width();
     let h = img.height();
     let rawimg = glium::texture::RawImage2d::from_raw_rgb(img.into_raw(), (w, h));
-    let tex = Texture2D::new(ctx, rawimg).expect("Failed to create texture");
-    tex
+    let ctx = system.display.get_context();
+    let tex = Texture2d::new(ctx, rawimg).expect("Failed to create texture");
+    let ref mut textures = system.renderer.textures();
+    let new_tex = imgui_glium_renderer::Texture {
+        texture: Rc::new(tex),
+        sampler: glium::uniforms::SamplerBehavior::default(),
+    };
+    textures.insert(new_tex)
 }
 
 pub fn main() {
-    // let system = init(file!());
+    let mut system = init(file!());
 
-    // let img = load_image("aliens");
-    // println!("The image is {} by {} pixels", img.width(), img.height());
+    let img = load_image("aliens");
+    let tex_id = image_into_texture(img, &mut system);
 
-    // let tex = image_into_texture(img, ?????????)
-
-    // system.main_loop(move |_, ui| {
-    //     Window::new(im_str!("Hello world"))
-    //         .size([300.0, 110.0], Condition::FirstUseEver)
-    //         .build(ui, || {
-    //             ui.text(im_str!("Hello world!"));
-    //         });
-    // });
+    system.main_loop(move |_, ui| {
+        Window::new(im_str!("Hello world"))
+            .size([300.0, 110.0], Condition::FirstUseEver)
+            .build(ui, || {
+                ui.text(im_str!("Hello world!"));
+                Image::new(tex_id, [50f32, 50f32]).build(ui);
+            });
+    });
 
     let factions = [
         "pirates",
