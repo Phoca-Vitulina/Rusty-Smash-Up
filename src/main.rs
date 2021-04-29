@@ -47,7 +47,8 @@ pub fn choose_players_factions(factions: &[Faction], used: &mut Vec<usize>) {
 }
 
 pub fn main() {
-    let system: System = init("Smash Up");
+    let size = (500f64, 500f64);
+    let system: System = init("Smash Up", size);
 
     let texture_cache = TextureCache::new(&system);
 
@@ -57,10 +58,17 @@ pub fn main() {
     };
 
     system.main_loop(move |_, ui| {
-        Window::new(im_str!("Hello world"))
-            .size([300.0, 110.0], Condition::FirstUseEver)
+        Window::new(im_str!("x"))
+            .size([size.0 as f32, size.1 as f32], Condition::Always)
+            .position([0.0, 0.0], Condition::Always)
+            .flags(
+                WindowFlags::NO_TITLE_BAR
+                    | WindowFlags::NO_RESIZE
+                    | WindowFlags::NO_COLLAPSE
+                    | WindowFlags::NO_MOVE,
+            )
             .build(ui, || {
-                ui.text(im_str!("Hello world!"));
+                // ui.text(im_str!(""));
                 faction_icon(&texture_cache, Faction::Aliens).build(ui);
                 faction_icon(&texture_cache, Faction::BearCavalry).build(ui);
                 faction_icon(&texture_cache, Faction::IttyCritters).build(ui);

@@ -20,7 +20,7 @@ pub struct System {
     pub font_size: f32,
 }
 
-pub fn init(title: &str) -> System {
+pub fn init(title: &str, size: (f64, f64)) -> System {
     let title = match Path::new(&title).file_name() {
         Some(file_name) => file_name.to_str().unwrap(),
         None => title,
@@ -29,7 +29,7 @@ pub fn init(title: &str) -> System {
     let context = glutin::ContextBuilder::new().with_vsync(true);
     let builder = WindowBuilder::new()
         .with_title(title.to_owned())
-        .with_inner_size(glutin::dpi::LogicalSize::new(1024f64, 768f64));
+        .with_inner_size(glutin::dpi::LogicalSize::new(size.0, size.1));
     let display =
         Display::new(builder, context, &event_loop).expect("Failed to initialize display");
 
