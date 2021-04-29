@@ -68,13 +68,13 @@ pub fn main() {
 
     system.main_loop(move |_, ui| {
         Window::new(im_str!("x"))
-            .size([size.0 as f32, size.1 as f32], Condition::Always)
-            // .size(ui.window_size(), Condition::Always)
+            .size([10000.0, 10000.0], Condition::Always)
+            //.size(ui.window_size(), Condition::Always)
             .position([0.0, 0.0], Condition::Always)
             .focused(true)
             .flags(
                 WindowFlags::NO_TITLE_BAR
-                    | WindowFlags::NO_RESIZE
+                    //| WindowFlags::ALWAYS_AUTO_RESIZE
                     | WindowFlags::NO_COLLAPSE
                     | WindowFlags::NO_MOVE,
             )
