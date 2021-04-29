@@ -78,7 +78,7 @@ pub fn init(title: &str, size: (f64, f64)) -> System {
 }
 
 impl System {
-    pub fn main_loop<F: FnMut(&mut bool, &mut Ui) + 'static>(self, mut run_ui: F) {
+    pub fn main_loop<F: FnMut(&mut bool, &mut Ui, (f64, f64)) + 'static>(self, mut run_ui: F) {
         let System {
             event_loop,
             display,
@@ -87,8 +87,8 @@ impl System {
             renderer,
             ..
         } = self;
+        let hidpi_factor = platform.hidpi_factor();
         let mut last_frame = Instant::now();
-
         event_loop.run(move |event, _, control_flow| match event {
             Event::NewEvents(_) => {
                 let now = Instant::now();
@@ -103,10 +103,11 @@ impl System {
                 gl_window.window().request_redraw();
             }
             Event::RedrawRequested(_) => {
+                let (fbw, fbh) = display.get_framebuffer_dimensions();
+                let screen_size = (fbw as f64 * hidpi_factor, fbh as f64 * hidpi_factor);
                 let mut ui = imgui.frame();
-
                 let mut run = true;
-                run_ui(&mut run, &mut ui);
+                run_ui(&mut run, &mut ui, screen_size);
                 if !run {
                     *control_flow = ControlFlow::Exit;
                 }

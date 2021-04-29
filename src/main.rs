@@ -66,10 +66,9 @@ pub fn main() {
         player_factions.push((String::from(*name), f1, f2));
     }
 
-    system.main_loop(move |_, ui| {
+    system.main_loop(move |_, ui, (w, h)| {
         Window::new(im_str!("x"))
-            .size([size.0 as f32, size.1 as f32], Condition::Always)
-            // .size(ui.window_size(), Condition::Always)
+            .size([w as f32, h as f32], Condition::Always)
             .position([0.0, 0.0], Condition::Always)
             .focused(true)
             .flags(
@@ -92,8 +91,6 @@ pub fn main() {
                     faction_icon(&texture_cache, *f2).build(ui);
                     ui.separator();
                 }
-                // ui.text(im_str!(""));
-                // faction_icon(&texture_cache, Faction::Aliens).build(ui);
             });
     });
 
