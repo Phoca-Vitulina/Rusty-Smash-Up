@@ -6,15 +6,17 @@ use glium::{Display, Surface};
 use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Ui};
 use imgui_glium_renderer::Renderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
+use std::cell::RefCell;
 use std::path::Path;
+use std::rc::Rc;
 use std::time::Instant;
 
 pub struct System {
     pub event_loop: EventLoop<()>,
-    pub display: glium::Display,
+    pub display: Rc<glium::Display>,
     pub imgui: Context,
     pub platform: WinitPlatform,
-    pub renderer: Renderer,
+    pub renderer: Rc<RefCell<Renderer>>,
     pub font_size: f32,
 }
 
@@ -27,7 +29,7 @@ pub fn init(title: &str) -> System {
     let context = glutin::ContextBuilder::new().with_vsync(true);
     let builder = WindowBuilder::new()
         .with_title(title.to_owned())
-        .with_inner_size(glutin::dpi::LogicalSize::new(500f64, 400f64));
+        .with_inner_size(glutin::dpi::LogicalSize::new(1024f64, 768f64));
     let display =
         Display::new(builder, context, &event_loop).expect("Failed to initialize display");
 
@@ -67,10 +69,10 @@ pub fn init(title: &str) -> System {
 
     System {
         event_loop,
-        display,
+        display: Rc::new(display),
         imgui,
         platform,
-        renderer,
+        renderer: Rc::new(RefCell::new(renderer)),
         font_size,
     }
 }
@@ -82,7 +84,7 @@ impl System {
             display,
             mut imgui,
             mut platform,
-            mut renderer,
+            renderer,
             ..
         } = self;
         let mut last_frame = Instant::now();
@@ -115,6 +117,7 @@ impl System {
                 platform.prepare_render(&ui, gl_window.window());
                 let draw_data = ui.render();
                 renderer
+                    .borrow_mut()
                     .render(&mut target, draw_data)
                     .expect("Rendering failed");
                 target.finish().expect("Failed to swap buffers");
