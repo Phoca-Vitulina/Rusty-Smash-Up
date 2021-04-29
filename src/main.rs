@@ -35,15 +35,14 @@ pub fn choose_index_nr(choices: usize, used: &[usize]) -> usize {
     }
 }
 
-pub fn choose_players_factions(factions: &[Faction], used: &mut Vec<usize>) {
-    for j in 0..2 {
-        let i = choose_index_nr(factions.len(), &used);
-        used.push(i);
-        print!(" {}", factions[i].name());
-        if j != 1 {
-            print!(" &")
-        }
-    }
+pub fn choose_players_factions(factions: &[Faction], used: &mut Vec<usize>) -> (Faction, Faction) {
+    let i = choose_index_nr(factions.len(), &used);
+    let first_faction = factions[i];
+    used.push(i);
+    let i = choose_index_nr(factions.len(), &used);
+    let second_faction = factions[i];
+    used.push(i);
+    (first_faction, second_faction)
 }
 
 pub fn main() {
@@ -54,13 +53,25 @@ pub fn main() {
 
     let faction_icon = |tc: &TextureCache, f: Faction| {
         let icon_path = faction_icon_path(f);
-        Image::new(tc.get(&icon_path), [50f32, 50f32])
+        Image::new(tc.get(&icon_path), [100f32, 100f32])
     };
+
+    let all_factions = Faction::all();
+    let players = ["Dinah", "Tim"];
+    let mut used: Vec<usize> = vec![];
+
+    let mut player_factions: Vec<(String, Faction, Faction)> = Vec::new();
+    for name in players.iter() {
+        let (f1, f2) = choose_players_factions(&all_factions, &mut used);
+        player_factions.push((String::from(*name), f1, f2));
+    }
 
     system.main_loop(move |_, ui| {
         Window::new(im_str!("x"))
             .size([size.0 as f32, size.1 as f32], Condition::Always)
+            // .size(ui.window_size(), Condition::Always)
             .position([0.0, 0.0], Condition::Always)
+            .focused(true)
             .flags(
                 WindowFlags::NO_TITLE_BAR
                     | WindowFlags::NO_RESIZE
@@ -68,23 +79,23 @@ pub fn main() {
                     | WindowFlags::NO_MOVE,
             )
             .build(ui, || {
+                for (name, f1, f2) in player_factions.iter() {
+                    let s = format!(
+                        "{}, you will battle with {} & {}",
+                        name,
+                        f1.name(),
+                        f2.name()
+                    );
+                    ui.text(ImString::new(s));
+                    faction_icon(&texture_cache, *f1).build(ui);
+                    ui.same_line_with_spacing(10.0, 150.0);
+                    faction_icon(&texture_cache, *f2).build(ui);
+                    ui.separator();
+                }
                 // ui.text(im_str!(""));
-                faction_icon(&texture_cache, Faction::Aliens).build(ui);
-                faction_icon(&texture_cache, Faction::BearCavalry).build(ui);
-                faction_icon(&texture_cache, Faction::IttyCritters).build(ui);
-                faction_icon(&texture_cache, Faction::MinionsOfCthulhu).build(ui);
+                // faction_icon(&texture_cache, Faction::Aliens).build(ui);
             });
     });
 
-    let all_factions = Faction::all();
-    let players = ["Dinah", "Tim"];
-    let mut used: Vec<usize> = vec![];
-
-    for name in players.iter() {
-        print!("\n");
-        print!("{}, you will battle with", name);
-        choose_players_factions(&all_factions, &mut used);
-        print!("\n");
-    }
     print!("\n");
 }
