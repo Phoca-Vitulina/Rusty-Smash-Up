@@ -29,6 +29,11 @@ pub enum Faction {
     GrimmsFairytales,
     AnansiTales,
     AncientIncas,
+    Superheroes,
+    Sharks,
+    Tornados,
+    Dragons,
+    MythicGreeks,
 }
 
 impl Faction {
@@ -63,10 +68,15 @@ impl Faction {
             Faction::GrimmsFairytales => "Grimm's Fairytales",
             Faction::AnansiTales => "Anansi Tales",
             Faction::AncientIncas => "Ancient Incas",
+            Faction::Superheroes => "Superheroes",
+            Faction::Sharks => "Sharks",
+            Faction::Tornados => "Tornados",
+            Faction::Dragons => "Dragons",
+            Faction::MythicGreeks => "Mythic Greeks",
         }
     }
 
-    pub fn all() -> [Faction; 29] {
+    pub fn all() -> [Faction; 34] {
         [
             Faction::Pirates,
             Faction::Aliens,
@@ -97,6 +107,11 @@ impl Faction {
             Faction::GrimmsFairytales,
             Faction::AnansiTales,
             Faction::AncientIncas,
+            Faction::Superheroes,
+            Faction::Sharks,
+            Faction::Tornados,
+            Faction::Dragons,
+            Faction::MythicGreeks,
         ]
     }
 }
